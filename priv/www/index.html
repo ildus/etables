@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Таблицы</title>
+    <link rel="stylesheet" type="text/css" href="static/ptsans/style.css">
+    <link rel="stylesheet" type="text/css" href="static/css/reset-min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    
+    <script src="static/js/jquery.tmpl.min.js"></script>
+    <script src="static/js/app.js"></script>
+</head>
+<body>
+    <header>
+        <h1> Таблицы </h1>
+        <div class="action"> Новая таблица</div>
+        <div class="action"> Изменить</div>
+        <div class="action"> Удалить таблицу</div>
+        <div class="delimiter"></div>
+        <div class="action"> Добавить строку </div>
+        <div class="info">
+            <div class="username"> Gamir </div>
+            <a href="/logout/"> Выйти из системы </a>
+        </div>
+    </header>
+    <section class="main">
+       <div class="tables_list">
+           <ul>
+               <!-- table list -->
+           </ul>
+       </div>
+       <div class="table_content">
+           <table class="table_view" summary="Employee Pay Sheet">
+		    <thead>
+		        <tr>
+		            <!-- table header -->
+		        </tr>
+		    </thead>
+		    <tbody>
+		        <!-- table body -->
+		    </tbody>
+		</table>
+       </div>
+       <script type="js-template" id="date-filter">
+               <li> 
+                   <label> Дата проведения: </label>
+                   <div class="date-filter">
+                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
+                   </div>
+               </li>
+       </script>
+       <script type="js-template" id="number-filter">
+               <li> 
+                   <label> Сумма: </label>
+                   <div class="number-filter">
+                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
+                   </div>
+               </li>
+       </script>
+       <script type="js-template" id="list-filter">
+               <li> 
+                   <label> Служащий: </label>
+                   <div>
+                     <ul> 
+                        <li> <input type="checkbox"> Иванов </li>
+                        <li> <input type="checkbox"> Степанов </li>
+                     </ul>
+                   </div>            
+               </li>
+       </script>       
+       <div class="table_filters">
+           <ul class="filters">
+               <!-- filters -->              
+           </ul>
+       </div>
+     </section>
+     <footer> </footer>
+</body>
+</html>

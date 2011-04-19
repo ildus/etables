@@ -1,0 +1,9 @@
+%% -*- erlang -*-
+{application, tables,
+ [{description, "tables"},
+  {vsn, "0.1"},
+  {modules, []},
+  {registered, []},
+  {mod, {'tables_app', []}},
+  {env, []},
+  {applications, [kernel, stdlib, crypto]}]}.
