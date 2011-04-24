@@ -6,9 +6,10 @@
 .DS_Store
 /TEST-*.xml
 /deps
-/db
 
+/db
 *.o
 *.beam
 /.project
 /.settings
+.sass-cache
