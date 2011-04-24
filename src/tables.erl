@@ -21,6 +21,8 @@ ensure_started(App) ->
 start() ->
     tables_deps:ensure(),
     ensure_started(crypto),
+    ensure_started(mnesia),
+    session_server:start(),
     application:start(tables).
 
 

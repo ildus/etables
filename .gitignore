@@ -6,6 +6,9 @@
 .DS_Store
 /TEST-*.xml
 /deps
+/db
 
 *.o
 *.beam
+/.project
+/.settings

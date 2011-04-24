@@ -5,41 +5,104 @@
     <title>Таблицы</title>
     <link rel="stylesheet" type="text/css" href="static/ptsans/style.css">
     <link rel="stylesheet" type="text/css" href="static/css/reset-min.css">
+    <link rel="stylesheet" type="text/css" href="static/ui/css/humanity/theme.css">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
     
-    <script src="static/js/jquery.tmpl.min.js"></script>
+    <script src="static/ui/js/jquery.js"></script>
+    <script src="static/js/jquery.history.js"></script>
+    <script src="static/ui/js/jquery-ui.js"></script>
+    <script src="static/js/pure.js"></script>
     <script src="static/js/app.js"></script>
+    <script src="static/js/jquery.ui.datepicker-ru.js"></script>
 </head>
 <body>
     <header>
         <h1> Таблицы </h1>
-        <div class="action"> Новая таблица</div>
-        <div class="action"> Изменить</div>
-        <div class="action"> Удалить таблицу</div>
+        <div class="action new_table"> Новая таблица</div>
+        <div class="action edit_table"> Изменить</div>
         <div class="delimiter"></div>
-        <div class="action"> Добавить строку </div>
+        <div class="action add_row"> Добавить строку </div>        
         <div class="info">
-            <div class="username"> Gamir </div>
-            <a href="/logout/"> Выйти из системы </a>
+            <div class="username"> </div>
+            <a href="javascript:void(0);" class="logout"> Выйти из системы </a>
         </div>
     </header>
     <section class="main">
        <div class="tables_list">
            <ul>
-               <!-- table list -->
+               <li> <a href="#"></a> <button class="deltable">&otimes;</button> </li>
            </ul>
        </div>
        <div class="table_content">
-           <table class="table_view" summary="Employee Pay Sheet">
+           <div class="text">Выберите таблицу для начала работы</div>
+           <table class="table_view">
 		    <thead>
-		        <tr>
-		            <!-- table header -->
-		        </tr>
+		        <tr><th scope="col"></th></tr>
 		    </thead>
 		    <tbody>
-		        <!-- table body -->
+		        <tr>
+		          <td class="presentation"></td>
+		          <td class="actions"> <button class="change_row">&nbsp;&rho;&nbsp;</button>&nbsp;
+		              <button class="delete_row">&otimes;</button> </td>
+		        </tr>
 		    </tbody>
+		    <tfoot>
+		        <tr>
+                  <td class="inputs"> <input type="text" class="ui-widget ui-widget-content"> </td>
+                  <td class="actions"> <button class="add">&oplus;</button>
+                                      <button class="hide">&otimes;</button> </td>
+                </tr>
+		    </tfoot>
 		</table>
+       </div>
+       <div id="table-edit-dialog">
+            <fieldset>
+                <label for="table_name">Название таблицы </label> &nbsp;
+                <input type="text" id="table_name" class="text ui-widget-content ui-corner-all" size="25">
+                
+                <table class="columns">
+                    <thead>
+                        <tr>
+                            <td> Столбцы таблицы: </td>
+                        </tr>
+                        <tr>
+                            <th> Название </th>
+                            <th> Тип </th>
+                            <th> Фильтр </th>
+                            <th> <button class="addcol">&oplus;</button> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-column="0" class="sortable">
+                            <td> <input type="text" size="17" 
+                                        class="text ui-widget-content ui-corner-all"> 
+                            </td>
+                            <td> <select>
+                                    <option value="int"> Число </option>
+                                    <option value="string"> Строковое </option>
+                                    <option value="datetime"> Дата </option>                                    
+                                </select>
+                            </td>
+                            <td> <input type="checkbox">
+                            <td> <button class="delcol">&otimes;</button> </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+       </div>
+       <div id="auth-dialog">
+            <fieldset>
+                <table>
+                <tr>
+                    <td><label for="username">Имя пользователя </label></td>
+                    <td><input type="text" id="username" class="text ui-widget-content ui-corner-all" size="25"></td>
+                </tr>
+                <tr>
+                    <td><label for="password">Пароль </label> &nbsp;</td>
+                    <td><input type="password" id="password" class="text ui-widget-content ui-corner-all" size="25"></td>
+                </tr>
+                </table>
+            </fieldset>
        </div>
        <script type="js-template" id="date-filter">
                <li> 
@@ -63,7 +126,6 @@
                    <div>
                      <ul> 
                         <li> <input type="checkbox"> Иванов </li>
-                        <li> <input type="checkbox"> Степанов </li>
                      </ul>
                    </div>            
                </li>

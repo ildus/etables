@@ -1,0 +1,31 @@
+tables
+
+{
+    table,
+    "table_name",
+    table_key,
+    [{int, "col1"}, {datetime, "col2"}, {number, "col3"}], %columns 
+    key, % owner
+    [key1, key2], %users    
+}
+
+users
+
+{
+    user,
+    user_key,
+    "username",
+    "md5 password",
+    true, %% is is admin
+}
+
+rows
+
+{
+    table_key,
+    [
+        {"col1", "value"},
+        {"col2", "value"}, %%row data
+        {"col3", "value"},
+    ]
+}
