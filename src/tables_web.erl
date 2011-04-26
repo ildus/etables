@@ -24,7 +24,7 @@ stop() ->
 
 loop(Req, DocRoot) ->
     "/" ++ Path = Req:get(path),
-    io:format("~nPath : ~p~n", [Path == "action"]),
+    io:format("~nMethod : ~p~n", [Req:get(method)]),
     SessionId = case Req:get_cookie_value("_session_cookie") of
                                         undefined -> session_server:new_session(undefined);
                                         Id -> Id
