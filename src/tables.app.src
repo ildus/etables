@@ -6,6 +6,5 @@
   {registered, []},
   {mod, {'tables_app', []}},
   {env, []},
-  {applications, [kernel, stdlib, crypto]}],
- [{inets, [{services, [{httpc, PropertyList}]}]}]  
+  {applications, [kernel, stdlib, crypto]}]
 }.
