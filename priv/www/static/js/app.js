@@ -429,7 +429,7 @@ TablesEditor.prototype = {
 		}
 		catch (e) {
 			if (hash != "") location.href = '/';
-			return false; 
+			return this; 
 		};
 		if (params.table) {
 			this.select_table(params.table);
