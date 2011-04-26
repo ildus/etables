@@ -64,7 +64,6 @@ function TablesEditor() {
 				if (bValid) {
 					self.action("authenticate", {'username': username.val(), 'password': password.val()},
 							function (data, status, xhr) {
-								console.log(self);
 								self.update_tables_list();
 							});
 					$( this ).dialog( "close" );
@@ -167,20 +166,18 @@ TablesEditor.prototype = {
 		var tbr = $('.table_view tbody');
 		this.tmpl_row_presentation = this.tmpl_row_presentation || tbr.html();
 		this.tmpl_one_row = this.tmpl_one_row || tbr.find('tr').html();
+		
 		this.tmpl_auth_block = this.tmpl_auth_block || $('header .info').html();
-		
-		var tl = $('.tables_list');
-		this.tmpl_table_list = this.tmpl_table_list || tl.html();
-		
-		var tf = $('.table_view tfoot tr');
-		this.tmpl_row_edit = this.tmpl_row_edit || tf.html();
+		this.tmpl_table_head = this.tmpl_table_head || $('.table_view thead tr').html();
+		this.tmpl_table_list = this.tmpl_table_list || $('.tables_list').html();
+		this.tmpl_row_edit = this.tmpl_row_edit || $('.table_view tfoot tr').html();
 		
 		this.current_table = 0;		
 		this.clear_page();
 		this.update_tables_list();
 	},
 	
-	clear_page: function () {		
+	clear_page: function () {
 		$('header .info').empty().html(this.tmpl_login);		
 		$('.table_view tbody').empty();
 		$('.tables_list').empty();
@@ -243,14 +240,21 @@ TablesEditor.prototype = {
 				});
 	},
 	
+	render: function (selector, template, data, directives) {
+		$(selector).empty().html(template).render(data, directives).show();
+		return this;
+	},
+	
 	fill_change_dialog: function () {
 		var table = this.tables[this.current_table];
 		if (table) {
 			$('#table_name').val(table.name);
-			$('table.columns tbody').html(this.tmpl_column).render({'columns': table.columns}, this.column_directives);
+			
+			var tbody_selector = 'table.columns tbody';
+			this.render(tbody_selector, this.tmpl_column, {'columns': table.columns}, this.column_directives);
 			for (id in table.columns) {
 				var col = table.columns[id];
-				var selector = 'table.columns tbody tr[data-column="'+id+'"] select';				
+				var selector = tbody_selector+' tr[data-column="'+id+'"] select';				
 				$(selector).val(col.type);
 			};
 		}
@@ -261,25 +265,25 @@ TablesEditor.prototype = {
 		$('.tables_list a').removeClass("selected").end().find('a[data-table="'+table_id+'"]').addClass('selected');
 		this.current_table = table_id-0;
 		
-		var th = $('.table_view thead tr');
-		this.tmpl_table_head = this.tmpl_table_head || th.html();
 		var table = this.tables[this.current_table];
 		
 		if (table) {
-			th.empty().html(this.tmpl_table_head).render({'columns': table.columns}, this.head_directives);
 			$('.table_content').find('.text').hide().end().find('.table_view').show();
-			this.update_table_data();
+			this.render('.table_view thead tr', this.tmpl_table_head, {'columns': table.columns}, this.head_directives)
+				.update_table_data();
 		}
 	},
 	
 	show_edit_row: function () {
 		var self = this;
-		var tf = $('.table_view tfoot tr');
 		var table = this.tables[this.current_table];
 		if (table) {
-			tf.empty().html(this.tmpl_row_edit).render({'columns': table.columns}, this.edit_directives).show();
-			var tf = $('.table_view tfoot tr');
+			var selector = this.dom('table_footer');
+			this.render(selector, this.tmpl_row_edit, {'columns': table.columns}, this.edit_directives);
+			var tf = $(selector);
 			tf.find('input[data-type="datetime"]').datepicker();
+			
+			//actions
 			tf.find('button.add').click(function (e) {
 				var row_data = self.collect_input_data(tf);
 				var table = self.tables[self.current_table];
@@ -294,16 +298,27 @@ TablesEditor.prototype = {
 		}
 	},
 	
+	dom: function (d) {
+		if (d.row) return '.table_view tr[data-row="'+d.row+'"]';
+		else if (d == 'table_header') 
+			return '.table_view thead tr';
+		else if (d == 'table_footer') 
+			return '.table_view tfoot tr';
+		else if (d == 'table_body')
+			return '.table_view tbody';
+ 	},
+	
 	show_change_row: function (row_id) {
 		var self = this;
-		var tf = $('.table_view tr[data-row="'+row_id+'"]');
 		var row = this.rows[row_id];
 		
 		var table = this.tables[this.current_table];
 		if (table) {
-			tf.empty().html(this.tmpl_row_edit).render({'columns': table.columns, 'row': row}, 
-					this.edit_directives).show();
-			var tf = $('.table_view tr[data-row="'+row_id+'"]');
+			var selector = this.dom({'row': row_id});
+			self.render(selector, self.tmpl_row_edit, 
+					{'columns': table.columns, 'row': row}, self.edit_directives);
+			
+			var tf = $(selector);
 			tf.find('input[data-type="datetime"]').datepicker();
 			tf.find('button.add').click(function (e) {
 				var row_data = self.collect_input_data(tf);
@@ -317,9 +332,16 @@ TablesEditor.prototype = {
 					});
 			});
 			tf.find('button.hide').click(function (e) {
-				tf.empty().html(self.tmpl_one_row).render({'row': row}, self.one_row_directives);
+				self.render(selector, self.tmpl_one_row, {'row': row}, self.one_row_directives);
 			});
 		}
+	},
+	
+	delete_row: function (row_id) {
+		var self = this;
+		this.action("delete_row", {'row_id': row_id}, function (data, status, xhr){
+			$(self.dom({'row': row_id})).remove();
+		});
 	},
 	
 	collect_input_data: function (line) {
@@ -360,13 +382,13 @@ TablesEditor.prototype = {
 	
 	update_tables_list: function () {
 		var self = this;
-		var tl = $('.tables_list');
 		this.action('tables_list', {}, function (data, status, xhr) {
 			self.tables = {};
-			for (var i=0; i<data.length; i++) self.tables[data[i].id] = data[i];
-			tl.empty().html(self.tmpl_table_list).render({'tables': data}, self.list_directives);
-			self.parse_hash(window.location.hash.replace(/^#/, ''));
-			self.check_authorization();
+			for (var i=0; i<data.length; i++) 
+				self.tables[data[i].id] = data[i];
+			self.render('.tables_list', self.tmpl_table_list, {'tables': data}, self.list_directives)
+				.parse_hash(window.location.hash.replace(/^#/, ''))
+				.check_authorization();
 		})
 	},
 	
@@ -396,7 +418,8 @@ TablesEditor.prototype = {
 					if (row)
 						self.rows[row.id] = row;
 				}
-				$('.table_view tbody').empty().html(self.tmpl_row_presentation).render({'rows': self.rows}, self.presentation_directives);
+				self.render(self.dom('table_body'), self.tmpl_row_presentation, 
+						{'rows': self.rows}, self.presentation_directives);
 			})
 	},
 	
@@ -411,6 +434,7 @@ TablesEditor.prototype = {
 		if (params.table) {
 			this.select_table(params.table);
 		}
+		return this;
 	}
 }
 
@@ -466,6 +490,14 @@ $(function () {
 		var row_id = Number($(this).parents('tr').eq(0).attr('data-row'));
 		if (!isNaN(row_id))
 			tables_editor.show_change_row(row_id);
+	});
+	
+	$('button.delete_row').live('click', function (e) {
+		if (confirm("Точно удалить строку?")) {
+			var row_id = Number($(this).parents('tr').eq(0).attr('data-row'));
+			if (!isNaN(row_id))
+				tables_editor.delete_row(row_id);
+		}
 	});
 	
 	$('button.deltable').live('click', function (e) {

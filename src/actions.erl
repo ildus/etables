@@ -13,7 +13,8 @@
 %%
 %% Exported Functions
 %%
--export([new_table/1, tables_list/1, delete_table/1, add_row/1, table_rows/1, edit_table/1, edit_row/1]).
+-export([new_table/1, tables_list/1, delete_table/1, add_row/1, table_rows/1, edit_table/1, edit_row/1,
+         delete_row/1]).
 -export([authenticate/1]).
 
 %%
@@ -65,6 +66,11 @@ add_row(S) ->
 edit_row(S) ->
     Id = struct:get_value(<<"row_id">>, S),
     change_row(S, Id).
+
+delete_row(S) ->
+    Id = struct:get_value(<<"row_id">>, S),
+    {atomic, ok} = tablesdb:delete({row, Id}),
+    struct:set_value(<<"deleted">>, <<"ok">>, S).
 
 change_row(S, Id) when is_integer(Id) ->
     TableId = struct:get_value(<<"table_id">>, S),
