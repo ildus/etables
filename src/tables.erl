@@ -23,6 +23,7 @@ start() ->
     ensure_started(crypto),
     ensure_started(mnesia),
     session_server:start(),
+    ensure_started(inets),
     application:start(tables).
 
 

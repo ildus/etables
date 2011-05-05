@@ -14,6 +14,7 @@
     <script src="static/js/pure.js"></script>
     <script src="static/js/app.js"></script>
     <script src="static/js/jquery.ui.datepicker-ru.js"></script>
+    <script src="static/js/jquery.form.js"></script>
 </head>
 <body>
     <header>
@@ -42,15 +43,17 @@
 		    <tbody>
 		        <tr>
 		          <td class="presentation"></td>
-		          <td class="actions"> <button class="change_row">&nbsp;&rho;&nbsp;</button>&nbsp;
-		              <button class="delete_row">&otimes;</button> </td>
+		          <td class="actions"> <button class="change_row">ред</button>&nbsp;
+		              <button class="delete_row">&otimes;</button> 
+		              <button class="print_row">пр</button>
+		          </td>
 		        </tr>
 		    </tbody>
 		    <tfoot>
 		        <tr>
                   <td class="inputs"> <input type="text" class="ui-widget ui-widget-content"> </td>
-                  <td class="actions"> <button class="add">&oplus;</button>
-                                      <button class="hide">&otimes;</button> </td>
+                  <td class="actions"> <button class="add">сохр</button>
+                                      <button class="hide">отм</button> </td>
                 </tr>
 		    </tfoot>
 		</table>
@@ -66,6 +69,7 @@
                             <td> Столбцы таблицы: </td>
                         </tr>
                         <tr>
+                            <th> Ид </th>
                             <th> Название </th>
                             <th> Тип </th>
                             <th> Фильтр </th>
@@ -75,7 +79,10 @@
                     <tbody>
                         <tr data-column="0" class="sortable">
                             <td> <input type="text" size="17" 
-                                        class="text ui-widget-content ui-corner-all"> 
+                                        class="text ui-widget-content ui-corner-all id"> 
+                            </td>
+                            <td> <input type="text" size="17" 
+                                        class="text ui-widget-content ui-corner-all name"> 
                             </td>
                             <td> <select>
                                     <option value="int"> Число </option>
@@ -89,8 +96,12 @@
                     </tbody>                    
                 </table>
                 <br>
-                <label for="file_template">Шаблон </label> &nbsp;
-                <input type="file" id="file_template">
+                <hr>
+                Текущий шаблон: <b id="table_template"> Не задано </b><br>                
+                <form id="templateUploader" method="POST" enctype="multipart/form-data">                
+                    <label for="file_template">Шаблон </label> &nbsp;
+                    <input type="file" name="file_template" id="file_template">
+                </form>
             </fieldset>
        </div>
        <div id="auth-dialog">

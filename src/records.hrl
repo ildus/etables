@@ -7,13 +7,14 @@
 -record(table, {    
     id, %% table id, int
     name, %% table name, string
-    columns = [{int, <<"id">>}], %% table columns [{str, "col1"}, {datetime, "col2"}, {number, "col3"}]
+    columns = [], %% table columns [{str, "col1"}, {datetime, "col2"}, {number, "col3"}]
     owner, %% owner(creator) id of this table
-    users = [] %% users can access to the table
+    users = [], %% users that can access to the table
+    template = []
 }).
 -record(row, {
     id, %% row id, int
     table_id, %% int
-    data %% row data, list, [{"col1", "value"}, {"col2", "value"}, {"col3", "value"},]
+    data %% row data, proplist, [{id, "value"}, {director, "value"}, {worker, "value"},]
 }).
 -record(counter, {key, value}).

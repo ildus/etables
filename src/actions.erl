@@ -22,27 +22,57 @@
 %%
 
 new_table(S) ->
-    change_table(S, tablesdb:new_id(tables)).
+    change_table(S, tablesdb:new_id(tables), true).
 
 edit_table(S) ->
-    change_table(S, struct:get_value(<<"table_id">>, S)).
-    
-change_table(S, Id) when is_integer(Id) -> 
+    change_table(S, struct:get_value(<<"table_id">>, S), false).
+
+%% --------------------------------------------------------------------
+%% Function: change_table/3
+%% Description: Change table structure
+%% --------------------------------------------------------------------
+change_table(S, Id, IsNew) when is_integer(Id) ->
+    User = struct:get_value(<<"user">>, S),
     Name = struct:get_value(<<"table_name">>, S),
     Columns = case struct:get_value(<<"columns">>, S) of
                   undefined -> [];
                   List when is_list(List) -> parse_columns(List)
               end,
-    {atomic, ok} = tablesdb:write(#table{id = Id, name = Name, columns = Columns}),
-    S1 = struct:set_value(<<"id">>, Id, S),
-    S1.
+    
+    CanChange = 
+        if
+            IsNew -> true;
+            true -> helpers:has_permission({change, User, Id})
+        end,
+    Res = 
+        if 
+            IsNew ->
+                NewTable = #table{id = Id, name = Name, columns = Columns, owner = User#user.id},
+                tablesdb:write(NewTable);
+            CanChange ->
+                OriginalTable = helpers:get_table(Id),
+                ChangedTable = OriginalTable#table{name = Name, columns = Columns},
+                tablesdb:write(ChangedTable);
+            true -> throw(access_denied)
+        end,
+    io:format("Res: ~p~n", [Res]),
+    [{<<"id">>, Id}].
     
 tables_list(S) ->
-    Tables = tablesdb:read_all(table),
+    User = struct:get_value(<<"user">>, S),
+    Tables = 
+        case User#user.is_admin of
+            true -> tablesdb:read_all(table);
+            false ->
+                Q = qlc:q([X || X <- mnesia:table(table), X#table.owner == User#user.id]),
+                tablesdb:find(Q)
+        end,
+             
     lists:map(fun(F) -> {struct, [
                                   {<<"id">>, F#table.id}, 
                                   {<<"name">>, F#table.name},
-                                  {<<"columns">>, reparse_columns(F#table.columns)}]} 
+                                  {<<"columns">>, reparse_columns(F#table.columns)},
+                                  {<<"template">>, list_to_binary(F#table.template)}]}
               end, Tables).
 
 table_rows(S) ->
@@ -58,7 +88,7 @@ table_rows(S) ->
 delete_table(S) ->
     Id = struct:get_value(<<"table_id">>, S),
     {atomic, ok} = tablesdb:delete({table, Id}),
-    struct:set_value(<<"deleted">>, <<"ok">>, S).
+    [{<<"deleted">>, Id}].
 
 add_row(S) ->
     change_row(S, tablesdb:new_id(rows)).
@@ -70,21 +100,21 @@ edit_row(S) ->
 delete_row(S) ->
     Id = struct:get_value(<<"row_id">>, S),
     {atomic, ok} = tablesdb:delete({row, Id}),
-    struct:set_value(<<"deleted">>, <<"ok">>, S).
+    [{<<"deleted">>, Id}].
 
 change_row(S, Id) when is_integer(Id) ->
     TableId = struct:get_value(<<"table_id">>, S),
     {struct, RowData} = S,
     RowData1 = repair_column_ids(RowData),
     {atomic, ok} = tablesdb:write(#row{id = Id, table_id = TableId, data = RowData1}),
-    struct:set_value(<<"row_id">>, Id, S).
+    [{<<"changed">>, Id}].
 
 authenticate(S) ->
     Username = binary_to_list(struct:get_value(<<"username">>, S)),
     Password = binary_to_list(struct:get_value(<<"password">>, S)),
     Q = qlc:q([X || X <- mnesia:table(user), X#user.username == Username]),
     case tablesdb:find(Q) of
-        [User|Other] ->
+        [User|_] ->
             if User#user.password == Password -> User;
                true -> undefined
             end;
@@ -99,16 +129,16 @@ parse_columns(Columns) ->
     parse_columns(Columns, []).
 
 parse_columns([], Res) ->
-    io:format("~p~n", [Res]),
     Res;
 parse_columns([Col|Other], Res) ->
-    [Name, Type, IsFilter, Id] = Col,
+    [Name, Type, IsFilter, Id, Atom] = Col,
     ColumnId = if Id == 0 -> tablesdb:new_id(columns);
                   is_integer(Id) -> Id;
                   is_list(Id) -> list_to_integer(Id)
                end,
     ColType = list_to_atom(binary_to_list(Type)),
-    parse_columns(Other, [{ColType, Name, IsFilter, ColumnId}|Res]).
+    ColAtom = list_to_atom(binary_to_list(Atom)),
+    parse_columns(Other, [{ColType, Name, IsFilter, ColumnId, ColAtom}|Res]).
 
 reparse_columns(Columns) ->
     reparse_columns(Columns, {struct, []}).
@@ -116,14 +146,16 @@ reparse_columns(Columns) ->
 reparse_columns([], S) ->
     S;
 reparse_columns([Col|Other], S) ->
-    {ColTypeA, Name, IsFilter, ColumnId} = Col,
+    {ColTypeA, Name, IsFilter, ColumnId, ColAtomA} = Col,
     ColKey = list_to_binary(integer_to_list(ColumnId)),
     ColType = list_to_binary(atom_to_list(ColTypeA)),
+    ColAtom = list_to_binary(atom_to_list(ColAtomA)),
     {struct, Res} = S,
     reparse_columns(Other, {struct, [{ColKey, {struct, [{<<"id">>, ColKey},
                                                         {<<"name">>, Name}, 
                                                         {<<"type">>, ColType},
-                                                        {<<"is_filter">>, IsFilter}]
+                                                        {<<"is_filter">>, IsFilter},
+                                                        {<<"atom">>, ColAtom}]
                                               }
                                      }|Res]
                            }).

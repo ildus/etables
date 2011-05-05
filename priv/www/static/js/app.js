@@ -4,8 +4,8 @@ function TablesEditor() {
 	this.table_dialog = $('#table-edit-dialog').dialog({ 
 		autoOpen: false, 
 		modal: true,
-		height: 400,
-		width: 480,
+		height: 600,
+		width: 600,
 		title: 'Создание/изменение таблицы',
 		buttons: {
 			"Сохранить": function() {
@@ -19,17 +19,20 @@ function TablesEditor() {
 					var col_valid = true;
 					var col_id = Number($(item).attr('data-column'));
 					
-					var wname = $(item).find('input[type="text"]');
+					var wid = $(item).find('input.id');
+					var wname = $(item).find('input.name');
 					var wtype = $(item).find('select');
 					var wfilter = $(item).find('input[type="checkbox"]');
 					
+					var col_atom = wid.val();
+					col_valid = col_valid && checkAtom(wid, "Ид столбца "+idx);
 					var col_name = wname.val();
 					col_valid = col_valid && checkLength(wname, "Имя столбца "+idx, 1, 30);
 					var type = wtype.val();
 					col_valid = col_valid && checkChoices(wtype, "Тип столбца "+idx, ["int", "datetime", "string"]);
 					var has_filter = wfilter.attr('checked');
 					
-					if (col_valid) columns.push([col_name, type, has_filter, col_id]);
+					if (col_valid) columns.push([col_name, type, has_filter, col_id, col_atom]);
 				});
 				if ( bValid && columns.length) {
 					var cl = $(this).dialog( "option", "dialogClass" );
@@ -64,6 +67,7 @@ function TablesEditor() {
 				if (bValid) {
 					self.action("authenticate", {'username': username.val(), 'password': password.val()},
 							function (data, status, xhr) {
+								$()
 								self.update_tables_list();
 							});
 					$( this ).dialog( "close" );
@@ -137,8 +141,9 @@ TablesEditor.prototype = {
 		'tr': {
 			'column<-columns': {
 				'.@data-column': 'column.id',
-				'input[type="text"]@value': 'column.name',
+				'input.name@value': 'column.name',
 				'input[type="checkbox"]@checked': 'column.is_filter',
+				'input.id@value': 'column.atom',
 			}
 		}
 	},
@@ -235,9 +240,24 @@ TablesEditor.prototype = {
 	edit_table: function (table_id, table_name, columns) {		
 		var self = this;
 		this.action('edit_table', {'table_name': table_name, 'columns': columns, 'table_id': table_id}, 
-				function () {
-					self.update_tables_list();
+				function (data, status, xhr) {
+					var options = {
+							iframe: true,
+							resetForm: true,
+							url: "/handle_template?"+$.param({'table_id': data.id}),
+					}
+					if ($('#file_template').val())
+						$('#templateUploader').ajaxSubmit(options);
+					self.update_tables_list()
 				});
+	},
+	
+	print_row: function (row_id) {
+		var qs = $.param({
+			table: this.rows[row_id].table_id,
+			row: row_id
+		})
+		location.href="/parse?"+qs;
 	},
 	
 	render: function (selector, template, data, directives) {
@@ -249,6 +269,7 @@ TablesEditor.prototype = {
 		var table = this.tables[this.current_table];
 		if (table) {
 			$('#table_name').val(table.name);
+			$('#table_template').text(table.template || "Не задано");
 			
 			var tbody_selector = 'table.columns tbody';
 			this.render(tbody_selector, this.tmpl_column, {'columns': table.columns}, this.column_directives);
@@ -442,7 +463,7 @@ var tables_editor = null;
 
 $(function () {
 	tables_editor = new TablesEditor();
-	$("table.columns tbody" ).sortable();
+	$("table.columns tbody" ).sortable();	
 	
 	$.history.init(function(hash){
         tables_editor.parse_hash(hash);
@@ -500,6 +521,12 @@ $(function () {
 		}
 	});
 	
+	$('button.print_row').live('click', function (e) {
+		var row_id = Number($(this).parents('tr').eq(0).attr('data-row'));
+		if (!isNaN(row_id))				
+			tables_editor.print_row(row_id);
+	});
+	
 	$('button.deltable').live('click', function (e) {
 		if (confirm("Удалить таблицу??")) {
 			if (confirm("Точно удалить таблицу?? Данные будет потеряны безвозвратно"))
@@ -542,6 +569,10 @@ function validate_number(value) {
 	return /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value);
 }
 
+function validate_atom(value) {
+	return /^[a-z_]+$/.test(value);
+}
+
 function mark_by_result(o, result) {
 	if (!result) o.addClass( "ui-state-error" ); else o.removeClass("ui-state-error");
 	return result;
@@ -561,13 +592,13 @@ function checkNumber(o, n) {
 	else return true;
 }
 
-function checkRegexp( o, regexp, n ) {
-	if ( !( regexp.test( o.val() ) ) ) {
-		o.addClass( "ui-state-error" );
-		return false;
-	} else {
-		return true;
+function checkAtom( o, n ) {
+	value = o.val();
+	if (value) {
+		result = validate_atom(value);
+		return mark_by_result(o, result);
 	}
+	else return true;
 }
 
 function checkChoices(o, n, values) {
