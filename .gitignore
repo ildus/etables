@@ -13,3 +13,4 @@
 /.project
 /.settings
 .sass-cache
+erl_crash.dump
