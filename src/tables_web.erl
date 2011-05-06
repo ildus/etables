@@ -124,35 +124,28 @@ loop(Req, DocRoot) ->
 
 %% Internal API
 
-%% @doc Handle uploading of a photo. Send a redirect response on success, or
-%% inform the user of the error. The uploaded photo, if valid, will be moved
-%% into the photos directory.
 upload_template(Req, DestinationDir, ValidExtensions, TableId) ->
     
     % Setup the file handler and parse the multipart data
     FileHandler = fun(Filename, ContentType) -> handle_file(Filename, ContentType) end,
     Files = mochiweb_multipart:parse_form(Req, FileHandler),
     
-    % Get the details of our 'photo'
     {OriginalFilename, _, TempFilename} = proplists:get_value("file_template", Files),
     
     % Check the file extension is valid
     case lists:member(filename:extension(OriginalFilename), ValidExtensions) of
         true ->
-            
-            % Attempt to move the file into the photos directory
             TemplateName = "template_" ++ integer_to_list(erlang:phash2(make_ref())) ++ ".odt",
             Destination = filename:join(DestinationDir, TemplateName),
             io:format("Destination: ~p~n", [Destination]),
             case file:copy(TempFilename, Destination) of                
                 {ok, _} ->
                     file:delete(TempFilename),
-                    helpers:set_template(TableId, TemplateName),
+                    catch helpers:set_template(TableId, TemplateName),
                     Req:ok({"text/html", [], ["<textarea>ok</textarea>"]});                    
                 {error, Reason} ->
                     % Something went wrong
                     file:delete(TempFilename),
-                    io:format("Reason: ~p~n", [Reason]),
                     Req:ok({"text/html", [], "<textarea>"++atom_to_list(Reason)++"</textarea>"})
             end;
             
