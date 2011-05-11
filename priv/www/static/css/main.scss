@@ -110,6 +110,22 @@ section.main {
         .table_view {
             display: none;
         }
+        
+        button {
+            border: 1px solid #eee;
+            display: inline-block;
+            height: 20px;
+            width: 20px;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+        }
+            
+        .act_change { background: transparent url("../img/pencil-small.png") 2px 2px no-repeat; }
+        .act_delete { background: transparent url("../img/slash.png") 1px 1px no-repeat; }
+        .act_print { background: transparent url("../img/point--arrow.png") 1px 1px no-repeat; }
+        .act_save { background: transparent url("../img/tick.png") 1px 1px no-repeat; }
+        .act_cancel { background: transparent url("../img/slash.png") 1px 1px no-repeat; }
     }    
     
     .table_filters {

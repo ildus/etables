@@ -92,6 +92,24 @@ section.main {
       margin-top: 100px; }
     section.main .table_content .table_view {
       display: none; }
+    section.main .table_content button {
+      border: 1px solid #eee;
+      display: inline-block;
+      height: 20px;
+      width: 20px;
+      margin: 0;
+      padding: 0;
+      cursor: pointer; }
+    section.main .table_content .act_change {
+      background: transparent url("../img/pencil-small.png") 2px 2px no-repeat; }
+    section.main .table_content .act_delete {
+      background: transparent url("../img/slash.png") 1px 1px no-repeat; }
+    section.main .table_content .act_print {
+      background: transparent url("../img/point--arrow.png") 1px 1px no-repeat; }
+    section.main .table_content .act_save {
+      background: transparent url("../img/tick.png") 1px 1px no-repeat; }
+    section.main .table_content .act_cancel {
+      background: transparent url("../img/slash.png") 1px 1px no-repeat; }
   section.main .table_filters {
     position: absolute;
     top: 0;
