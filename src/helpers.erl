@@ -99,7 +99,7 @@ prepare_row_data([Column| Columns], Data) ->
     {ColType, _, _, Id, Atom} = Column,
     Value = proplists:get_value(Id, Data),
     ValueRes = case ColType of
-                   datetime -> {Days1,{_,_,_}} = calendar:seconds_to_daystime(trunc(Value/1000)),
+                   datetime when is_integer(Value) -> {Days1,{_,_,_}} = calendar:seconds_to_daystime(trunc(Value/1000)),
                                {Year, Month, Day} = calendar:gregorian_days_to_date(Days1+719528+1),
                                io_lib:format("~2..0B.~2..0B.~p", [Day, Month, Year]);
                    _ -> Value
