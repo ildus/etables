@@ -96,5 +96,12 @@ get_template_data(User, TableId, RowId) when is_integer(TableId), is_integer(Row
 prepare_row_data([], _) ->
     [];
 prepare_row_data([Column| Columns], Data) ->
-    {_, _, _, Id, Atom} = Column,
-    [{Atom, proplists:get_value(Id, Data)} | prepare_row_data(Columns, Data)].
+    {ColType, _, _, Id, Atom} = Column,
+    Value = proplists:get_value(Id, Data),
+    ValueRes = case ColType of
+                   datetime -> {Days1,{_,_,_}} = calendar:seconds_to_daystime(trunc(Value/1000)),
+                               {Year, Month, Day} = calendar:gregorian_days_to_date(Days1+719528+1),
+                               io_lib:format("~2..0B.~2..0B.~p", [Day, Month, Year]);
+                   _ -> Value
+               end,
+    [{Atom, ValueRes} | prepare_row_data(Columns, Data)].
