@@ -11,145 +11,145 @@
     <script src="static/ui/js/jquery.js"></script>
     <script src="static/js/jquery.history.js"></script>
     <script src="static/ui/js/jquery-ui.js"></script>
-    <script src="static/js/pure.js"></script>
-    <script src="static/js/app.js"></script>
     <script src="static/js/jquery.ui.datepicker-ru.js"></script>
     <script src="static/js/jquery.form.js"></script>
+    <script src="static/js/jquery.tmpl.js"></script>
+    <script src="static/js/knockout-1.2.1.js"></script>
+    <script src="static/js/app2.js"></script>
 </head>
 <body>
     <header>
         <h1> Таблицы </h1>
-        <div class="action new_table"> Новая таблица</div>
-        <div class="action edit_table"> Изменить</div>
+        <div class="action" data-bind="click: new_table"> Новая таблица</div>
+        <div class="action" data-bind="click: edit_table"> Изменить</div>
         <div class="delimiter"></div>
-        <div class="action add_row"> Добавить строку </div>        
+        <div class="action" data-bind="click: add_row"> Добавить строку </div>        
         <div class="info">
-            <div class="username"> </div>
-            <a href="javascript:void(0);" class="logout"> Выйти из системы </a>
+            <div class="username" data-bind="text: username"> </div>
+            <a href="#" class="logout" data-bind="visible: username"> Выйти из системы </a>
+            <a href="#" class="login" data-bind="visible: !username"> Войти в систему </a>
         </div>
     </header>
     <section class="main">
-       <div class="tables_list">
-           <ul>
-               <li> <a href="#"></a> <button class="deltable">&otimes;</button> </li>
-           </ul>
-       </div>
+       <div class="tables_list"> <ul data-bind="template: {name: 'table-list-item', foreach: tables}"> </ul> </div>
        <div class="table_content">
-           <div class="text">Выберите таблицу для начала работы</div>
-           <table class="table_view">
-		    <thead>
-		        <tr><th scope="col"></th></tr>
-		    </thead>
-		    <tbody>
-		        <tr>
-		          <td class="presentation"></td>
-		          <td class="actions"> <button class="change_row act_change"></button>
-		              <button class="delete_row act_delete"></button> 
-		              <button class="print_row act_print"></button>
-		          </td>
-		        </tr>
-		    </tbody>
-		    <tfoot>
-		        <tr>
-                  <td class="inputs"> <input type="text" class="ui-widget ui-widget-content"> </td>
-                  <td class="actions"> <button class="add act_save"></button>
-                                      <button class="hide act_cancel"></button> </td>
-                </tr>
-		    </tfoot>
+            <div class="text" data-bind="visible: !current_table()">Выберите таблицу для начала работы</div>
+            <table class="table_view" data-bind="visible: current_table()">
+		    <thead> <tr data-bind="template: 'table-columns'"> </tr> </thead>
+		    <tbody data-bind="template: {name: 'table-rows', foreach: rows}"> </tbody>
 		</table>
-       </div>
-       <div id="table-edit-dialog">
-            <fieldset>
-                <label for="table_name">Название таблицы </label> &nbsp;
-                <input type="text" id="table_name" class="text ui-widget-content ui-corner-all" size="25">
-                
-                <table class="columns">
-                    <thead>
-                        <tr>
-                            <td> Столбцы таблицы: </td>
-                        </tr>
-                        <tr>
-                            <th> Ид </th>
-                            <th> Название </th>
-                            <th> Тип </th>
-                            <th> Фильтр </th>
-                            <th> <button class="addcol">&oplus;</button> </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr data-column="0" class="sortable">
-                            <td> <input type="text" size="17" 
-                                        class="text ui-widget-content ui-corner-all id"> 
-                            </td>
-                            <td> <input type="text" size="17" 
-                                        class="text ui-widget-content ui-corner-all name"> 
-                            </td>
-                            <td> <select>
-                                    <option value="int"> Число </option>
-                                    <option value="string"> Строковое </option>
-                                    <option value="datetime"> Дата </option>                                    
-                                </select>
-                            </td>
-                            <td> <input type="checkbox">
-                            <td> <button class="delcol">&otimes;</button> </td>
-                        </tr>
-                    </tbody>                    
-                </table>
-                <br>
-                <hr>
-                Текущий шаблон: <b id="table_template"> Не задано </b><br>                
-                <form id="templateUploader" method="POST" enctype="multipart/form-data">                
-                    <label for="file_template">Шаблон </label> &nbsp;
-                    <input type="file" name="file_template" id="file_template">
-                </form>
-            </fieldset>
-       </div>
-       <div id="auth-dialog">
-            <fieldset>
-                <table>
-                <tr>
-                    <td><label for="username">Имя пользователя </label></td>
-                    <td><input type="text" id="username" class="text ui-widget-content ui-corner-all" size="25"></td>
-                </tr>
-                <tr>
-                    <td><label for="password">Пароль </label> &nbsp;</td>
-                    <td><input type="password" id="password" class="text ui-widget-content ui-corner-all" size="25"></td>
-                </tr>
-                </table>
-            </fieldset>
-       </div>
-       <script type="js-template" id="date-filter">
-               <li> 
-                   <label> Дата проведения: </label>
-                   <div class="date-filter">
-                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
-                   </div>
-               </li>
-       </script>
-       <script type="js-template" id="number-filter">
-               <li> 
-                   <label> Сумма: </label>
-                   <div class="number-filter">
-                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
-                   </div>
-               </li>
-       </script>
-       <script type="js-template" id="list-filter">
-               <li> 
-                   <label> Служащий: </label>
-                   <div>
-                     <ul> 
-                        <li> <input type="checkbox"> Иванов </li>
-                     </ul>
-                   </div>            
-               </li>
-       </script>       
+       </div>      
        <div class="table_filters">
            <ul class="filters">
                <!-- filters -->              
            </ul>
        </div>
      </section>
+     
+     <!-- templates -->
+     
+     <script type="text/html" id="table-list-item">
+            <li> 
+                <a data-table="${id}" data-bind="text: name, css: {selected: is_selected()}"
+                    href="#{table:${ id }}"></a> 
+                <button data-bind="click: remove">&otimes;</button> 
+            </li>
+	 </script>
+	 <script type="text/html" id="table-columns">
+        {{if current_table }}
+            {{each(index, column) current_table().columns }}
+            <th scope="col">${column.name}</th>
+            {{/each}}
+        {{/if}}
+     </script>
+     
+     <script type="text/html" id="table-rows">        
+            <tr data-row="${id}">                  
+                  {{each(index,val) data }} <td class="presentation">${val.verbose}</td> {{/each}}
+                  <td class="actions"> 
+                       <button class="act_change" data-bind="click: change"></button>
+                       <button class="act_delete" data-bind="click: remove"></button> 
+                       <button class="act_print" data-bind="click: print"></button>
+                  </td>
+            </tr>
+     </script>
+     <script type="text/html" id="table-editor-columns">
+        <tr data-column="${id}" data-bind="css: {invalid: !is_valid()}">
+                         <td> <input data-bind="value: atom" type="text" size="17" 
+                                     class="text ui-widget-content ui-corner-all id"> 
+                         </td>
+                         <td> <input data-bind="value: name" type="text" size="17" 
+                                     class="text ui-widget-content ui-corner-all name"> 
+                         </td>
+                         <td> <select data-bind="value: coltype">
+                                 <option value="int"> Число </option>
+                                 <option value="string"> Строковое </option>
+                                 <option value="datetime"> Дата </option>                                    
+                             </select>
+                         </td>
+                         <td> <input data-bind="checked: has_filter" type="checkbox">
+                         <td> <button data-bind="click: remove">&otimes;</button> </td>
+                     </tr>
+     </script>
+     <script type="text/html" id="row-editor">
+        <tr>
+        <td><label for="col${column_id}">${column_name}</label></td>
+        <td><input data-bind="value: edit_value, css: {'ui-state-error': !is_valid()}" 
+            type="text" data-type="${type}" id="col${column_id}" 
+            class="text ui-widget-content ui-corner-all" size="30"></td> </tr>
+     </script>
+     
+     <!-- end of templates -->
+	 
+	 <!-- dialogs -->
+	 <div id="table-edit-dialog">
+	     <fieldset>
+	         <label for="table_name">Название таблицы </label> &nbsp;
+	         <input id="table_name" data-bind="value: edited_table.name, css: {'ui-state-error': !edited_table.is_name_valid()}" 
+	           class="text ui-widget-content ui-corner-all" size="25">
+	         
+	         <table class="columns">
+	             <thead>
+	                 <tr>
+	                     <td> Столбцы таблицы: </td>
+	                 </tr>
+	                 <tr>
+	                     <th> Ид </th>
+	                     <th> Название </th>
+	                     <th> Тип </th>
+	                     <th> Фильтр </th>
+	                     <th> <button data-bind="click: add_column">&oplus;</button> </th>
+	                 </tr>
+	             </thead>
+	             <tbody data-bind="template: {name: 'table-editor-columns', foreach: edited_table.columns }"> </tbody>                    
+	         </table>
+	         <br>
+	         <hr>
+	         Текущий шаблон: <b id="table_template" data-bind="text: edited_table.template"> Не задано </b><br>                
+	         <form id="templateUploader" method="POST" enctype="multipart/form-data">                
+	             <label for="file_template">Шаблон </label> &nbsp;
+	             <input type="file" name="file_template" id="file_template">
+	         </form>
+	     </fieldset>
+	 </div>
+	 <div id="auth-dialog">
+	     <fieldset>
+	         <table>
+	         <tr>
+	             <td><label for="username">Имя пользователя </label></td>
+	             <td><input type="text" id="username" class="text ui-widget-content ui-corner-all" size="25"></td>
+	         </tr>
+	         <tr>
+	             <td><label for="password">Пароль </label> &nbsp;</td>
+	             <td><input type="password" id="password" class="text ui-widget-content ui-corner-all" size="25"></td>
+	         </tr>
+	         </table>
+	     </fieldset>
+	 </div>
+	 <div id="row-editor-dialog">
+         <table data-bind="template: {name: 'row-editor', foreach: edited_row.values}"></table>
+     </div>
+     <!-- end of dialogs -->
      <footer> </footer>
 </body>
 </html>

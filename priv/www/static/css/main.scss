@@ -107,9 +107,6 @@ section.main {
             color: #EEE;
             margin-top: 100px;
         }
-        .table_view {
-            display: none;
-        }
         
         button {
             border: 1px solid #eee;
@@ -148,6 +145,10 @@ table.columns {
     td, th {
         padding: 5px;
         text-align: center;
+    }
+    
+    tr.invalid {
+        background-color: #ddadaf;    
     }
 }
 
@@ -212,8 +213,8 @@ ul.filters {
 //jquery ui rules rewriting
 .ui-widget { font-family: "PT Sans", Verdana; font-size: 1em; }
 
-#auth-dialog {
+#auth-dialog, #row-editor-dialog {
     table {
-        td {padding: 5px 10px;}
+        td {padding: 2px 10px;}
     }
 }

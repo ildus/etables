@@ -90,8 +90,6 @@ section.main {
       text-align: center;
       color: #EEE;
       margin-top: 100px; }
-    section.main .table_content .table_view {
-      display: none; }
     section.main .table_content button {
       border: 1px solid #eee;
       display: inline-block;
@@ -125,6 +123,8 @@ table.columns {
   table.columns td, table.columns th {
     padding: 5px;
     text-align: center; }
+  table.columns tr.invalid {
+    background-color: #ddadaf; }
 
 table.table_view {
   font-family: "PT Sans", serif;
@@ -169,5 +169,5 @@ ul.filters ul {
   font-family: "PT Sans", Verdana;
   font-size: 1em; }
 
-#auth-dialog table td {
-  padding: 5px 10px; }
+#auth-dialog table td, #row-editor-dialog table td {
+  padding: 2px 10px; }

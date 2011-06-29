@@ -1,0 +1,44 @@
+<script type="text/html" id="table-list-item">
+    {{each ( index, table ) tables() }}
+    <li> <a href="#{table:${table.id}}">${table.name}</a> <button class="deltable">&otimes;</button> </li>
+    {{/each}}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- потом будут работать -->
+<script type="text/html" id="date-filter">
+               <li> 
+                   <label> Дата проведения: </label>
+                   <div class="date-filter">
+                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
+                   </div>
+               </li>
+       </script>
+<script type="text/html" id="number-filter">
+               <li> 
+                   <label> Сумма: </label>
+                   <div class="number-filter">
+                   С &nbsp; <input type="text" size="10"> по &nbsp; <input type="text" size="10">
+                   </div>
+               </li>
+       </script>
+<script type="text/html" id="list-filter">
+               <li> 
+                   <label> Служащий: </label>
+                   <div>
+                     <ul> 
+                        <li> <input type="checkbox"> Иванов </li>
+                     </ul>
+                   </div>            
+               </li>
+       </script>

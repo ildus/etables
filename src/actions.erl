@@ -132,10 +132,12 @@ parse_columns([], Res) ->
     Res;
 parse_columns([Col|Other], Res) ->
     [Name, Type, IsFilter, Id, Atom] = Col,
+    io:format("~p", [Id]),
     ColumnId = if Id == 0 -> tablesdb:new_id(columns);
                   is_integer(Id) -> Id;
-                  is_list(Id) -> list_to_integer(Id)
-               end,
+                  is_list(Id) -> list_to_integer(Id);
+                  is_binary(Id) -> list_to_integer(binary_to_list(Id))
+               end,    
     ColType = list_to_atom(binary_to_list(Type)),
     ColAtom = list_to_atom(binary_to_list(Atom)),
     parse_columns(Other, [{ColType, Name, IsFilter, ColumnId, ColAtom}|Res]).
