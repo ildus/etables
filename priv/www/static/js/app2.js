@@ -91,6 +91,27 @@ var tablesViewModel = {
 	current_table: ko.observable(null), //Table
 	rows: ko.observableArray([]), //[Row, Row]
 	
+	//auth
+	auth: {
+		username: ko.observable(''),
+		password: ko.observable(''),
+	},
+	
+	clear_page: function () {
+		this.tables([]);
+		this.current_table(null);
+		this.rows([]);
+		this.username('');
+	},
+	
+	logout: function () {
+		var self = this;
+		this.action("logout", {}, function () {
+			self.clear_page();
+			self.check_authorization();
+		});
+	},
+	
 	//editing table
 	edited_table: {
 		name: ko.observable(''),
@@ -363,22 +384,13 @@ var tablesViewModel = {
 			width: 480,
 			title: 'Авторизация',
 			buttons: {
-				"Попробовать": function() {
-					var username = $("#username");
-					var password = $("#password");
-					
-					var bValid = true;				
-					bValid = bValid && checkLength( username, "Имя пользователя", 5, 30);
-					bValid = bValid && checkLength( password, "Пароль", 1, 200);
-					
-					if (bValid) {
-						self.action("authenticate", {'username': username.val(), 'password': password.val()},
-								function (data, status, xhr) {
-									$()
-									self.update_tables_list();
-								});
-						$( this ).dialog( "close" );
-					}
+				"Попробовать": function() {					
+					self.action("authenticate", {'username': self.auth.username(), 'password': self.auth.password()},
+						function (data, status, xhr) {
+							$()
+							self.update_tables_list();
+						});
+					$( this ).dialog( "close" );
 				},
 				"Отмена": function() {	$( this ).dialog( "close" ); }
 			},

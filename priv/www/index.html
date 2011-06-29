@@ -26,8 +26,8 @@
         <div class="action" data-bind="click: add_row"> Добавить строку </div>        
         <div class="info">
             <div class="username" data-bind="text: username"> </div>
-            <a href="#" class="logout" data-bind="visible: username"> Выйти из системы </a>
-            <a href="#" class="login" data-bind="visible: !username"> Войти в систему </a>
+            <a href="#" class="logout" data-bind="visible: username(), click: logout"> Выйти из системы </a>
+            <a href="#" class="login" data-bind="visible: !username(), click: show_auth_dialog"> Войти в систему </a>
         </div>
     </header>
     <section class="main">
@@ -137,11 +137,13 @@
 	         <table>
 	         <tr>
 	             <td><label for="username">Имя пользователя </label></td>
-	             <td><input type="text" id="username" class="text ui-widget-content ui-corner-all" size="25"></td>
+	             <td><input type="text" data-bind="value: auth.username" id="username" 
+	               class="text ui-widget-content ui-corner-all" size="25"></td>
 	         </tr>
 	         <tr>
 	             <td><label for="password">Пароль </label> &nbsp;</td>
-	             <td><input type="password" id="password" class="text ui-widget-content ui-corner-all" size="25"></td>
+	             <td><input type="password" data-bind="value: auth.password" id="password" 
+	               class="text ui-widget-content ui-corner-all" size="25"></td>
 	         </tr>
 	         </table>
 	     </fieldset>
