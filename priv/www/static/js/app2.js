@@ -100,7 +100,7 @@ var tablesViewModel = {
 	
 	pagination: {
 		current_page: ko.observable(1),
-		limit: ko.observable(20),
+		limit: ko.observable(10),
 		pages_count: ko.observable(0),
 		
 		next_page: function () {
