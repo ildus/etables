@@ -90,8 +90,11 @@ section.main {
       section.main .table_content .options input {
         border: none;
         width: 50px; }
-      section.main .table_content .options button {
-        font-weight: bold; }
+      section.main .table_content .options button, section.main .table_content .options select {
+        border: 1px solid #eee;
+        background-color: white;
+        min-width: 20px;
+        cursor: pointer; }
     section.main .table_content .text {
       vertical-align: middle;
       font-size: 50px;

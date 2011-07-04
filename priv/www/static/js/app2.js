@@ -98,9 +98,21 @@ var tablesViewModel = {
 	current_table: ko.observable(null), //Table
 	rows: ko.observableArray([]), //[Row, Row]
 	
-	current_page: ko.observable(1),
-	limit: ko.observable(20),
-	pages_count: ko.observable(0),
+	pagination: {
+		current_page: ko.observable(1),
+		limit: ko.observable(20),
+		pages_count: ko.observable(0),
+		
+		next_page: function () {
+			var val= this.pagination.current_page();
+			if (val < this.pagination.pages_count()) this.pagination.current_page(val+1);
+		},
+		
+		prev_page: function () {
+			var val= this.pagination.current_page();
+			if (val > 1) this.pagination.current_page(val-1);
+		},
+	},
 	
 	//auth
 	auth: {
@@ -315,10 +327,17 @@ var tablesViewModel = {
 	
 	update_table_data: function () {
 		var self = this;
-		if (this.current_table())
-			this.action("table_rows", {'table_id': this.current_table().id}, function (data, status, xhr) {
-				self.rows(data.map(function (item) {return self.prepare_row(item)}));
-			})
+		if (this.current_table()) {
+			var limit = self.pagination.limit();
+			this.action("table_rows", {'table_id': this.current_table().id,
+						"start": (self.pagination.current_page() - 1) * limit,
+						"limit": Number(limit)
+						}, 
+						function (data, status, xhr) {
+							self.rows(data.records.map(function (item) {return self.prepare_row(item)}));
+							self.pagination.pages_count(Math.ceil(data.total_count / limit));
+						});
+		}
 	},
 	
 	init: function () {
@@ -414,6 +433,18 @@ tablesViewModel.current_columns = ko.dependentObservable(function () {
 	if (this.current_table() != null) return this.current_table().columns;
 	else return [];
 }, tablesViewModel);
+
+tablesViewModel.pagination.limit.subscribe(function(newValue) {
+	tablesViewModel.pagination.current_page(1);
+	tablesViewModel.update_table_data();
+});
+
+tablesViewModel.pagination.current_page.subscribe(function(newValue) {
+	if (newValue <= tablesViewModel.pagination.pages_count())
+		tablesViewModel.update_table_data();
+	else tablesViewModel.pagination.current_page(1);
+		
+});
 
 $(function () {
 	ko.applyBindings(tablesViewModel);

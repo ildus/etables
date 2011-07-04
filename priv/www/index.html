@@ -37,10 +37,20 @@
             <div data-bind="visible: current_table()">
 	            <div class="options">
 	                <button title="На первую страницу">&#x3C;&#x3C;</button>
-	                <input data-bind="value: current_page, attr: {max: pages_count}, valueUpdate: 'afterkeydown'" type="number" step="1" value="1" min="1">
+	                <button data-bind="click: pagination.prev_page">&#x3C;</button>
+	                стр.
+	                <input data-bind="value: pagination.current_page, attr: {max: pagination.pages_count}, valueUpdate: 'afterkeydown'" type="text" step="1" value="1" min="1">
+	                по
+	                <select data-bind="value: pagination.limit">
+	                   <option value="1"> 1 </option>
+	                   <option value="20"> 20 </option>
+	                   <option value="30"> 30 </option>
+	                   <option value="40"> 40 </option>
+	                   <option value="50"> 50 </option>
+	                </select>
+	                <button data-bind="click: pagination.next_page">&#x3E;</button>
 	                <button title="На последнюю страницу">&#x3E;&#x3E;</button>
-	                &nbsp;
-	                <span data-bind="text: current_page"></span> стр., всего <span data-bind="text: pages_count"></span> стр.
+	                &nbsp; всего <span data-bind="text: pagination.pages_count"></span> стр.
 	            </div>
 	            <table class="table_view">
 				    <thead> <tr data-bind="template: 'table-columns'"> </tr> </thead>

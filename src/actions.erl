@@ -77,6 +77,8 @@ tables_list(S) ->
 
 table_rows(S) ->
     TableId = struct:get_value(<<"table_id">>, S),
+    Start = struct:get_value(<<"start">>, S),
+    Limit = struct:get_value(<<"limit">>, S),
     Q = qlc:q([X || X <- mnesia:table(row), X#row.table_id == TableId]),
     [TableInfo] = tablesdb:read({table, TableId}),
     SortField = TableInfo#table.sortfield,
@@ -89,11 +91,13 @@ table_rows(S) ->
     end,
        
     Rows = tablesdb:find(Q1),
-    lists:map(fun(R) -> {struct, [
-                                  {<<"id">>, R#row.id},
-                                  {<<"table_id">>, R#row.table_id},
-                                  {<<"data">>, R#row.data}]}
-              end, Rows).
+    Rows1 = lists:sublist(Rows, Start + 1, Limit),
+    Records = lists:map(fun(R) -> {struct, [
+                                    {<<"id">>, R#row.id},
+                                    {<<"table_id">>, R#row.table_id},                                  
+                                    {<<"data">>, R#row.data}]}
+              end, Rows1),
+    {struct, [{<<"records">>, Records}, {<<"total_count">>, length(Rows)}]}.
 
 delete_table(S) ->
     Id = struct:get_value(<<"table_id">>, S),
