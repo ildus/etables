@@ -7,6 +7,7 @@ function Table(id, name, columns, template) {
 		columns: columns,
 		template: template || 'Не задано',
 		select: function () {
+			tablesViewModel.pagination.current_page(1);
 			tablesViewModel.current_table(this);
 			tablesViewModel.update_table_data();
 		},
