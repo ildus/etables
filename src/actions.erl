@@ -78,7 +78,17 @@ tables_list(S) ->
 table_rows(S) ->
     TableId = struct:get_value(<<"table_id">>, S),
     Q = qlc:q([X || X <- mnesia:table(row), X#row.table_id == TableId]),
-    Rows = tablesdb:find(Q),
+    [TableInfo] = tablesdb:read({table, TableId}),
+    SortField = TableInfo#table.sortfield,
+    Q1 = if 
+            SortField == id -> qlc:sort(Q, {order, fun (Row1, Row2) -> Row1#row.id > Row2#row.id end});
+            is_integer(SortField) -> qlc:sort(Q, {order, 
+                                   fun (Row1, Row2) -> 
+                                            proplists:get_value(Row1#row.data, SortField) > 
+                                                proplists:get_value(Row2#row.data, SortField) end})
+    end,
+       
+    Rows = tablesdb:find(Q1),
     lists:map(fun(R) -> {struct, [
                                   {<<"id">>, R#row.id},
                                   {<<"table_id">>, R#row.table_id},
@@ -149,11 +159,11 @@ reparse_columns([], S) ->
     S;
 reparse_columns([Col|Other], S) ->
     {ColTypeA, Name, IsFilter, ColumnId, ColAtomA} = Col,
-    ColKey = list_to_binary(integer_to_list(ColumnId)),
+    ColId = list_to_binary(integer_to_list(ColumnId)),
     ColType = list_to_binary(atom_to_list(ColTypeA)),
     ColAtom = list_to_binary(atom_to_list(ColAtomA)),
     {struct, Res} = S,
-    reparse_columns(Other, {struct, [{ColKey, {struct, [{<<"id">>, ColKey},
+    reparse_columns(Other, {struct, [{ColId, {struct, [{<<"id">>, ColId},
                                                         {<<"name">>, Name}, 
                                                         {<<"type">>, ColType},
                                                         {<<"is_filter">>, IsFilter},

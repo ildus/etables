@@ -15,7 +15,14 @@ function Table(id, name, columns, template) {
 		},
 		is_selected: function () {
 			return tablesViewModel.current_table() && tablesViewModel.current_table().id == this.id;
-		},		
+		},
+		
+		query: '',
+		start: 0,
+		limit: 30,
+		sort: 'id',
+		dir: 'asc',
+		total_count: ''
 	}
 }
 
@@ -32,7 +39,7 @@ function Row(id, table_id, data) {
 		},
 		print: function () {
 			tablesViewModel.print_row(this);
-		},
+		}
 	}
 }
 
@@ -91,6 +98,10 @@ var tablesViewModel = {
 	current_table: ko.observable(null), //Table
 	rows: ko.observableArray([]), //[Row, Row]
 	
+	current_page: ko.observable(1),
+	limit: ko.observable(20),
+	pages_count: ko.observable(0),
+	
 	//auth
 	auth: {
 		username: ko.observable(''),
@@ -122,7 +133,7 @@ var tablesViewModel = {
 		},
 		is_valid: function () {
 			var all_valid = true;
-			this.columns().map(function (col) {all_valid = all_valid && col.is_valid(); });
+			this.columns().forEach(function (col) {all_valid = all_valid && col.is_valid(); });
 			return all_valid && this.is_name_valid();
 		}
 	},
@@ -267,11 +278,8 @@ var tablesViewModel = {
 	update_tables_list: function () {
 		var self = this;
 		this.action('tables_list', {}, function (data, status, xhr) {
-			var tables = [];
-			
-			for (var i=0; i<data.length; i++) tables.push(new Table(data[i].id, data[i].name, data[i].columns, 
-															data[i].template));
-			self.tables(tables);
+			self.tables(data.map(function (item) {return new Table(item.id, item.name, item.columns, 
+															item.template)}));
 			self.parse_hash(window.location.hash.replace(/^#/, '')).check_authorization();
 		})
 	},
@@ -307,15 +315,9 @@ var tablesViewModel = {
 	
 	update_table_data: function () {
 		var self = this;
-		//this.hide_edit_row();
 		if (this.current_table())
 			this.action("table_rows", {'table_id': this.current_table().id}, function (data, status, xhr) {
-				rows = [];
-				for (var i=0; i< data.length;i++) {
-					var row = self.prepare_row(data[i]);
-					if (row) rows.push(row);
-				}
-				self.rows(rows);
+				self.rows(data.map(function (item) {return self.prepare_row(item)}));
 			})
 	},
 	
@@ -359,7 +361,7 @@ var tablesViewModel = {
 			buttons: {
 				"Сохранить": function() {
 					var columns = [];
-					self.edited_table.columns().map(function (col) {
+					self.edited_table.columns().forEach(function (col) {
 						if (col.is_valid()) columns.push([col.name(), col.coltype(), col.has_filter(), col.id, col.atom()]);
 					});
 					if (self.edited_table.is_valid() && columns.length) {
@@ -387,7 +389,6 @@ var tablesViewModel = {
 				"Попробовать": function() {					
 					self.action("authenticate", {'username': self.auth.username(), 'password': self.auth.password()},
 						function (data, status, xhr) {
-							$()
 							self.update_tables_list();
 						});
 					$( this ).dialog( "close" );

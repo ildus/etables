@@ -100,6 +100,20 @@ section.main {
     	padding: 10px;
     	height: 100%;
     	
+    	.options {
+    	   padding: 5px;
+    	   background-color: #f5f5f5;
+    	   
+    	   input {
+    	       border: none;
+    	       width: 50px;
+    	   }
+    	   
+    	   button {
+    	       font-weight: bold;
+    	   }
+    	}
+    	
     	.text {
     	    vertical-align: middle;
             font-size: 50px;
@@ -108,14 +122,16 @@ section.main {
             margin-top: 100px;
         }
         
-        button {
-            border: 1px solid #eee;
-            display: inline-block;
-            height: 20px;
-            width: 20px;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
+        .table_view {        
+            button {
+                border: 1px solid #eee;
+                display: inline-block;
+                height: 20px;
+                width: 20px;
+                margin: 0;
+                padding: 0;
+                cursor: pointer;
+            }
         }
             
         .act_change { background: transparent url("../img/pencil-small.png") 2px 2px no-repeat; }

@@ -34,10 +34,19 @@
        <div class="tables_list"> <ul data-bind="template: {name: 'table-list-item', foreach: tables}"> </ul> </div>
        <div class="table_content">
             <div class="text" data-bind="visible: !current_table()">Выберите таблицу для начала работы</div>
-            <table class="table_view" data-bind="visible: current_table()">
-		    <thead> <tr data-bind="template: 'table-columns'"> </tr> </thead>
-		    <tbody data-bind="template: {name: 'table-rows', foreach: rows}"> </tbody>
-		</table>
+            <div data-bind="visible: current_table()">
+	            <div class="options">
+	                <button title="На первую страницу">&#x3C;&#x3C;</button>
+	                <input data-bind="value: current_page, attr: {max: pages_count}, valueUpdate: 'afterkeydown'" type="number" step="1" value="1" min="1">
+	                <button title="На последнюю страницу">&#x3E;&#x3E;</button>
+	                &nbsp;
+	                <span data-bind="text: current_page"></span> стр., всего <span data-bind="text: pages_count"></span> стр.
+	            </div>
+	            <table class="table_view">
+				    <thead> <tr data-bind="template: 'table-columns'"> </tr> </thead>
+				    <tbody data-bind="template: {name: 'table-rows', foreach: rows}"> </tbody>
+				</table>
+			</div>
        </div>      
        <div class="table_filters">
            <ul class="filters">

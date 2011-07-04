@@ -10,7 +10,8 @@
     columns = [], %% table columns [{str, "col1"}, {datetime, "col2"}, {number, "col3"}]
     owner, %% owner(creator) id of this table
     users = [], %% users that can access to the table
-    template = []
+    template = [],
+    sortfield = id
 }).
 -record(row, {
     id, %% row id, int
