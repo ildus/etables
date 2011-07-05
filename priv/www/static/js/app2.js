@@ -113,6 +113,14 @@ var tablesViewModel = {
 			var val= this.pagination.current_page();
 			if (val > 1) this.pagination.current_page(val-1);
 		},
+		
+		first_page: function () {
+			this.pagination.current_page(1);
+		},
+		
+		last_page: function () {
+			this.pagination.current_page(this.pagination.pages_count());
+		}
 	},
 	
 	//auth

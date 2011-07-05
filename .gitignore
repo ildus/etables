@@ -10,6 +10,8 @@
 /db
 *.o
 *.beam
+fabfile.py
+*.pyc
 /.project
 /.settings
 .sass-cache

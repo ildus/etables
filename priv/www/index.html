@@ -36,7 +36,7 @@
             <div class="text" data-bind="visible: !current_table()">Выберите таблицу для начала работы</div>
             <div data-bind="visible: current_table()">
 	            <div class="options">
-	                <button title="На первую страницу">&#x3C;&#x3C;</button>
+	                <button title="На первую страницу" data-bind="click: pagination.first_page">&#x3C;&#x3C;</button>
 	                <button data-bind="click: pagination.prev_page">&#x3C;</button>
 	                стр.
 	                <input data-bind="value: pagination.current_page, attr: {max: pagination.pages_count}, valueUpdate: 'afterkeydown'" type="text" step="1" value="1" min="1">
@@ -50,7 +50,7 @@
 	                   <option value="50"> 50 </option>
 	                </select>
 	                <button data-bind="click: pagination.next_page">&#x3E;</button>
-	                <button title="На последнюю страницу">&#x3E;&#x3E;</button>
+	                <button title="На последнюю страницу" data-bind="click: pagination.last_page">&#x3E;&#x3E;</button>
 	                &nbsp; всего <span data-bind="text: pagination.pages_count"></span> стр.
 	            </div>
 	            <table class="table_view">
@@ -61,7 +61,7 @@
        </div>      
        <div class="table_filters">
            <ul class="filters">
-               <!-- filters -->              
+               <!-- filters -->
            </ul>
        </div>
      </section>
