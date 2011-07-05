@@ -200,6 +200,7 @@ table.table_view
     
     td:last-child {
         border-bottom: none;
+        min-width: 60px;
     }
     
     tbody tr:hover td {
