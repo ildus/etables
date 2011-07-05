@@ -40,6 +40,9 @@ function Row(id, table_id, data) {
 		},
 		print: function () {
 			tablesViewModel.print_row(this);
+		},
+		duplicate: function () {
+			tablesViewModel.duplicate_row(this);
 		}
 	}
 }
@@ -273,6 +276,18 @@ var tablesViewModel = {
 		var table = this.current_table();
 		if (table) {
 			this.edited_row.row_id = row.id;
+			this.edited_row.table_id = table.id
+			
+			this.edited_row.values(row.data());
+			this.show_editor_dialog();
+			$('input[data-type="datetime"]').datepicker();
+		};
+	},
+	
+	duplicate_row: function (row) {
+		var table = this.current_table();
+		if (table) {
+			this.edited_row.row_id = 0;
 			this.edited_row.table_id = table.id
 			
 			this.edited_row.values(row.data());

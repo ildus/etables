@@ -120,6 +120,8 @@ section.main {
       background: transparent url("../img/tick.png") 1px 1px no-repeat; }
     section.main .table_content .act_cancel {
       background: transparent url("../img/slash.png") 1px 1px no-repeat; }
+    section.main .table_content .act_duplicate {
+      background: transparent url("../img/duplicate.png") 1px 1px no-repeat; }
   section.main .table_filters {
     position: absolute;
     top: 0;
